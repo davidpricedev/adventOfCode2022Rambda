@@ -31,11 +31,27 @@ const day3Part1 = R.pipe(
     R.trim(),
     R.split("\n"),
     R.map(priorityValueFromContents),
-    R.sum
+    R.sum,
+);
+
+const findBadgeItem = ([a, b, c]) => R.intersection(a, R.intersection(b, c));
+
+const findBadgeValue = R.pipe(
+    findBadgeItem,
+    ([x]) => x,
+    itemToValue,
+);
+
+const day3Part2 = R.pipe(
+    R.trim(),
+    R.split("\n"),
+    R.splitEvery(3),
+    R.map(findBadgeValue),
+    R.sum,
 );
 
 export async function run() {
     const rawFileContent = await getFileContent(inputFile);
     console.log("day3 part1: ", day3Part1(rawFileContent));
-    // console.log("day3 part2: ", day3Part2());
+    console.log("day3 part2: ", day3Part2(rawFileContent));
 }
