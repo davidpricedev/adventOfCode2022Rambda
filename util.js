@@ -6,6 +6,7 @@ export const sortFnNumDesc = (a, b) => b - a;
 
 export const getFileContent = async (filename) => (await fs.readFile(filename)).toString().trim();
 
+// for debugging with ramda
 export const inspect = (msg) => (payload) => {
     console.log(`[inspect] ${msg}: `, payload);
     return payload;

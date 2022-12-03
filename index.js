@@ -1,4 +1,4 @@
-import { run } from './day1/day1.js';
+import { run } from './day2/index.js';
 
 async function main() {
     await run();
