@@ -1,0 +1,32 @@
+{
+  "name": "adventofcode2022rambda",
+  "version": "1.0.0",
+  "description": "This repository contains my solutions for many of the puzzles in the [advent of code 2022](https://adventofcode.com/2022).",
+  "main": "index.js",
+  "type": "module",
+  "moduleFileExtensions": [
+    "js",
+    "jsx",
+    "mjs"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "aoc": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davidpricedev/adventOfCode2022Rambda.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/davidpricedev/adventOfCode2022Rambda/issues"
+  },
+  "homepage": "https://github.com/davidpricedev/adventOfCode2022Rambda#readme",
+  "dependencies": {
+    "ramda": "0.28.0"
+  },
+  "devDependencies": {
+    "jest": "29.3.1"
+  }
+}
