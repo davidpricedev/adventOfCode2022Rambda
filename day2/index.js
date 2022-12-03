@@ -3,7 +3,7 @@ import { inspect, getFileContent } from '../util.js';
 
 const inputFile = "day2/input.txt";
 
-const interpretInstruction = (inst) => {
+const interpretInstructionP1 = (inst) => {
     const instmap = {
         A: "Rock",
         B: "Paper",
@@ -52,22 +52,67 @@ const scoreRound = (round) => roundResultValue(winLoseOrDraw(round)) + intrinsic
 
 const convertMovePairToRound = ([theirMove, myMove]) => ({theirMove, myMove});
 
-const lineToRound = R.pipe(
+const lineToRoundP1 = R.pipe(
     R.trim(),
     R.split(" "),
-    R.map(interpretInstruction),
+    R.map(interpretInstructionP1),
     convertMovePairToRound
 );
 
 const day2Part1 = R.pipe(
     R.trim(),
     R.split("\n"),
-    R.map(R.pipe(lineToRound, scoreRound)),
+    R.map(R.pipe(lineToRoundP1, scoreRound)),
     R.sum
+);
+
+const interpretInstructionP2 = (inst) => {
+    const instmap = {
+        A: "Rock",
+        B: "Paper",
+        C: "Scissors",
+        X: "Lose",
+        Y: "Draw",
+        Z: "Win",
+    };
+    return instmap[inst];
+};
+
+const convertInstructionPairToRound = ([theirMove, targetResult]) => {
+    const winTable = {
+        "Rock": "Paper",
+        "Paper": "Scissors",
+        "Scissors": "Rock",
+    };
+    const loseTable = {
+        "Rock": "Scissors",
+        "Paper": "Rock",
+        "Scissors": "Paper",
+    };
+    const myMoveTable = {
+        "Lose": loseTable[theirMove],
+        "Win": winTable[theirMove],
+        "Draw": theirMove,
+    }
+    return { theirMove, myMove: myMoveTable[targetResult], targetResult };
+};
+
+const lineToRoundP2 = R.pipe(
+    R.trim(),
+    R.split(" "),
+    R.map(interpretInstructionP2),
+    convertInstructionPairToRound,
+);
+
+const day2Part2 = R.pipe(
+    R.trim(),
+    R.split("\n"),
+    R.map(R.pipe(lineToRoundP2, scoreRound)),
+    R.sum,
 );
 
 export async function run() {
     const rawFileContent = await getFileContent(inputFile);
     console.log("day2 part1: ", day2Part1(rawFileContent));
-    // console.log("day2 part2: ", day1Part2(sums));
+    console.log("day2 part2: ", day2Part2(rawFileContent));
 }
