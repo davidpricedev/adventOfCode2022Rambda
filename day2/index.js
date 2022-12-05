@@ -3,6 +3,12 @@ import { inspect, getFileContent } from '../util.js';
 
 const inputFile = "day2/input.txt";
 
+/*
+Data Shape:
+
+type Round = { theirMove: string, myMove: string }
+*/
+
 const interpretInstructionP1 = (inst) => {
     const instmap = {
         A: "Rock",
