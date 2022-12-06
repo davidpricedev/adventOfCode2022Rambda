@@ -49,7 +49,7 @@ const parseMoves = R.pipe(
   R.map(parseMoveLine),
 );
 
-const applyMove = (state, { count, fromStack, toStack}) => {
+const applyMoveP1 = (state, { count, fromStack, toStack}) => {
   const [a, b] = R.splitAt(-1 * count, state[fromStack]);
   return {
     ...state,
@@ -58,7 +58,7 @@ const applyMove = (state, { count, fromStack, toStack}) => {
   };
 };
 
-const applyMoves = ({ state, moves }) => R.reduce(inspectReducer(applyMove), state, moves);
+const applyMovesP1 = ({ state, moves }) => R.reduce(applyMoveP1, state, moves);
 
 const parseFile = R.pipe(
   R.split("\n\n"),
@@ -67,12 +67,29 @@ const parseFile = R.pipe(
 
 const day5Part1 = R.pipe(
   parseFile,
-  applyMoves,
+  applyMovesP1,
+  R.mapObjIndexed((v, k, o) => R.last(v)),
+);
+
+const applyMoveP2 = (state, { count, fromStack, toStack}) => {
+  const [a, b] = R.splitAt(-1 * count, state[fromStack]);
+  return {
+    ...state,
+    [fromStack]: a,
+    [toStack]: [...state[toStack], ...b],
+  };
+};
+
+const applyMovesP2 = ({ state, moves }) => R.reduce(applyMoveP2, state, moves);
+
+const day5Part2 = R.pipe(
+  parseFile,
+  applyMovesP2,
   R.mapObjIndexed((v, k, o) => R.last(v)),
 );
 
 export async function run() {
     const rawFileContent = await getFileContent(inputFile);
     console.log("day5 part1: ", day5Part1(rawFileContent));
-    // console.log("day5 part2: ", day5Part2(rawFileContent));
+    console.log("day5 part2: ", day5Part2(rawFileContent));
 }
