@@ -2,7 +2,7 @@
   "name": "adventofcode2022rambda",
   "version": "1.0.0",
   "description": "This repository contains my solutions for many of the puzzles in the [advent of code 2022](https://adventofcode.com/2022).",
-  "main": "index.js",
+  "main": "main.js",
   "type": "module",
   "moduleFileExtensions": [
     "js",
@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "aoc": "node index.js"
+    "aoc": "node main.js"
   },
   "repository": {
     "type": "git",

@@ -9,7 +9,7 @@ const day1Part2 = R.pipe(R.sort(sortFnNumAsc), R.slice(-3, Infinity), R.sum)
 
 const eachElfContents = R.pipe(R.trim, R.split("\n"), R.map(Number), R.sum);
 
-const caloriesByElf = R.pipe(R.split("\n\n"), R.map(eachElfContents));
+const caloriesByElf = R.pipe(R.trim, R.split("\n\n"), R.map(eachElfContents));
 
 export async function run() {
     const rawFileContent = await getFileContent(inputFile);

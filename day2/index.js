@@ -59,14 +59,14 @@ const scoreRound = (round) => roundResultValue(winLoseOrDraw(round)) + intrinsic
 const convertMovePairToRound = ([theirMove, myMove]) => ({theirMove, myMove});
 
 const lineToRoundP1 = R.pipe(
-    R.trim(),
+    R.trim,
     R.split(" "),
     R.map(interpretInstructionP1),
     convertMovePairToRound
 );
 
 const day2Part1 = R.pipe(
-    R.trim(),
+    R.trim,
     R.split("\n"),
     R.map(R.pipe(lineToRoundP1, scoreRound)),
     R.sum
@@ -104,14 +104,14 @@ const convertInstructionPairToRound = ([theirMove, targetResult]) => {
 };
 
 const lineToRoundP2 = R.pipe(
-    R.trim(),
+    R.trim,
     R.split(" "),
     R.map(interpretInstructionP2),
     convertInstructionPairToRound,
 );
 
 const day2Part2 = R.pipe(
-    R.trim(),
+    R.trim,
     R.split("\n"),
     R.map(R.pipe(lineToRoundP2, scoreRound)),
     R.sum,

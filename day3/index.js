@@ -28,7 +28,7 @@ const priorityValueFromContents = R.pipe(
 );
 
 const day3Part1 = R.pipe(
-    R.trim(),
+    R.trim,
     R.split("\n"),
     R.map(priorityValueFromContents),
     R.sum,
@@ -43,7 +43,7 @@ const findBadgeValue = R.pipe(
 );
 
 const day3Part2 = R.pipe(
-    R.trim(),
+    R.trim,
     R.split("\n"),
     R.splitEvery(3),
     R.map(findBadgeValue),
