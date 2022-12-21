@@ -25,3 +25,5 @@ export const mergeObjs = R.reduce((acc, x) => ({ ...acc, ...x }), {});
 
 // immutable push
 export const ipush = R.curry((newItem, array) => [ ...array, newItem ]);
+
+export const objSize = R.pipe(Object.keys, R.length);
