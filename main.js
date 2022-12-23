@@ -1,8 +1,10 @@
-import { run } from './day6/index.js';
+import { run } from "./day11/index.js";
 
 async function main() {
-    await run();
+  await run();
 }
 
 console.log("Starting...");
-main().then(() => console.log("done." )).catch(err => console.error("unhandled error", err));
+main()
+  .then(() => console.log("done."))
+  .catch((err) => console.error("unhandled error", err));
