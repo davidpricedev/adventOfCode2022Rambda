@@ -18,20 +18,20 @@ type State = { [stackName: number]: Stack }
 */
 
 const cleanStateEntry = R.pipe(
-  R.reduce((acc, x) => ([" ", "[", "]"].includes(x) ? acc : x), "")
+  R.reduce((acc, x) => ([" ", "[", "]"].includes(x) ? acc : x), ""),
 );
 
 const parseStateLine = R.pipe(
   R.split(""),
   R.splitEvery(4),
-  R.map(cleanStateEntry)
+  R.map(cleanStateEntry),
 );
 
 const applyStateLine = (state, stateLine) => {
   const updates = mergeObjs(
     stateLine.map((x, i) =>
-      R.objOf(`${i + 1}`, x ? ipush(x, state[i + 1]) : state[i + 1])
-    )
+      R.objOf(`${i + 1}`, x ? ipush(x, state[i + 1]) : state[i + 1]),
+    ),
   );
   return { ...state, ...updates };
 };
@@ -39,7 +39,7 @@ const applyStateLine = (state, stateLine) => {
 const buildState = ([firstLine, ...stateLines]) => {
   const state = R.pipe(
     R.map((x) => ({ [x]: [] })),
-    mergeObjs
+    mergeObjs,
   )(firstLine);
   return R.reduce(applyStateLine, state, stateLines);
 };
@@ -48,7 +48,7 @@ const parseState = R.pipe(
   R.split("\n"),
   R.reverse,
   R.map(parseStateLine),
-  buildState
+  buildState,
 );
 
 const parseMoveLine = R.pipe(
@@ -57,7 +57,7 @@ const parseMoveLine = R.pipe(
     count,
     fromStack,
     toStack,
-  })
+  }),
 );
 
 const parseMoves = R.pipe(R.trim, R.split("\n"), R.map(parseMoveLine));
@@ -81,7 +81,7 @@ const parseFile = R.pipe(R.split("\n\n"), ([rawState, rawMoves]) => ({
 const day5Part1 = R.pipe(
   parseFile,
   applyMovesP1,
-  R.mapObjIndexed((v, k, o) => R.last(v))
+  R.mapObjIndexed((v, k, o) => R.last(v)),
 );
 
 const applyMoveP2 = (state, { count, fromStack, toStack }) => {
@@ -98,7 +98,7 @@ const applyMovesP2 = ({ state, moves }) => R.reduce(applyMoveP2, state, moves);
 const day5Part2 = R.pipe(
   parseFile,
   applyMovesP2,
-  R.mapObjIndexed((v, k, o) => R.last(v))
+  R.mapObjIndexed((v, k, o) => R.last(v)),
 );
 
 export async function run() {

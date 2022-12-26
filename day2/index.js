@@ -63,14 +63,14 @@ const lineToRoundP1 = R.pipe(
   R.trim,
   R.split(" "),
   R.map(interpretInstructionP1),
-  convertMovePairToRound
+  convertMovePairToRound,
 );
 
 const day2Part1 = R.pipe(
   R.trim,
   R.split("\n"),
   R.map(R.pipe(lineToRoundP1, scoreRound)),
-  R.sum
+  R.sum,
 );
 
 const interpretInstructionP2 = (inst) => {
@@ -108,14 +108,14 @@ const lineToRoundP2 = R.pipe(
   R.trim,
   R.split(" "),
   R.map(interpretInstructionP2),
-  convertInstructionPairToRound
+  convertInstructionPairToRound,
 );
 
 const day2Part2 = R.pipe(
   R.trim,
   R.split("\n"),
   R.map(R.pipe(lineToRoundP2, scoreRound)),
-  R.sum
+  R.sum,
 );
 
 export async function run() {

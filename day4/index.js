@@ -35,21 +35,21 @@ const lineToPair = R.pipe(
   R.trim,
   R.split(","),
   R.map(parseRange),
-  ([a, b]) => ({ a, b })
+  ([a, b]) => ({ a, b }),
 );
 
 const day4Part1 = R.pipe(
   R.trim,
   R.split("\n"),
   R.map(R.pipe(lineToPair, hasFullOverlap, boolAsCountable)),
-  R.sum
+  R.sum,
 );
 
 const day4Part2 = R.pipe(
   R.trim,
   R.split("\n"),
   R.map(R.pipe(lineToPair, hasAnyOverlap, boolAsCountable)),
-  R.sum
+  R.sum,
 );
 
 export async function run() {

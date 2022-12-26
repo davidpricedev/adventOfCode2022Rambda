@@ -3,5 +3,8 @@
   "editor.formatOnSave": true,
   "files.exclude": {
     // "**/node_modules": true
-  }
+  },
+  "prettier.trailingComma": "all",
+  "prettier.configPath": "./.prettierrc",
+  "prettier.requireConfig": true
 }

@@ -1,9 +1,10 @@
 import P from "parsimmon";
 import * as R from "ramda";
-import assert from "node:assert";
 import _assertPromise from "ramda/src/internal/_assertPromise.js";
 import {
   getFileContent,
+  tryParse,
+  keyBy,
   inspect,
   inspectReducer,
   ipush,
@@ -12,6 +13,7 @@ import {
 } from "../util.js";
 
 const inputFile = "day11/input.txt";
+//const inputFile = "day11/sample.txt";
 
 const sampleMonkey = `Monkey 5:
   Starting items: 60, 94
@@ -22,46 +24,49 @@ const sampleMonkey = `Monkey 5:
 `;
 
 const nl = P.string("\n");
-const eatnl = (p) => P.seq(p, nl).map(([r, _w]) => r);
 const numP = P.regexp(/[0-9]+/).map(Number);
 const itemListP = P.sepBy(numP, P.string(", "));
 const operatorP = P.alt(P.string("+"), P.string("*"));
 const operandP = P.alt(numP, P.string("old"));
-const headerLineP =
-  P.seq(P.string("Monkey "), numP, P.string(":")).map(([_label, n]) => ({
+const headerLineP = P.seq(P.string("Monkey "), numP, P.string(":")).map(
+  ([_label, n]) => ({
     monkeyNum: n,
-  }));
+  }),
+);
 
-const itemsLineP =
-  P.seq(P.whitespace, P.string("Starting items: "), itemListP).map(
-    ([_w, _label, items]) => ({ items })
-  );
-const operationLineP =
-  P.seq(
-    P.whitespace,
-    P.string("Operation: new = "),
-    operandP,
-    P.whitespace,
-    operatorP,
-    P.whitespace,
-    operandP
-  ).map(([_w1, _label, operand1, _w2, operator, _w3, operand2]) => ({
-    operand1,
-    operator,
-    operand2,
-  }));
-const testLineP =
-  P.seq(P.whitespace, P.string("Test: divisible by "), numP).map(
-    ([_w, _label, n]) => ({ divTestNum: n })
-  );
-const ifTrueLineP =
-  P.seq(P.whitespace, P.string("If true: throw to monkey "), numP).map(
-    ([_w, _label, n]) => ({ targetIfTrue: n })
-  );
-const ifFalseLineP =
-  P.seq(P.whitespace, P.string("If false: throw to monkey "), numP).map(
-    ([_w, _label, n]) => ({ targetIfFalse: n })
-  );
+const itemsLineP = P.seq(
+  P.whitespace,
+  P.string("Starting items: "),
+  itemListP,
+).map(([_w, _label, items]) => ({ items }));
+const operationLineP = P.seq(
+  P.whitespace,
+  P.string("Operation: new = "),
+  operandP,
+  P.whitespace,
+  operatorP,
+  P.whitespace,
+  operandP,
+).map(([_w1, _label, operand1, _w2, operator, _w3, operand2]) => ({
+  operand1,
+  operator,
+  operand2,
+}));
+const testLineP = P.seq(
+  P.whitespace,
+  P.string("Test: divisible by "),
+  numP,
+).map(([_w, _label, n]) => ({ divTestNum: n }));
+const ifTrueLineP = P.seq(
+  P.whitespace,
+  P.string("If true: throw to monkey "),
+  numP,
+).map(([_w, _label, n]) => ({ targetIfTrue: n }));
+const ifFalseLineP = P.seq(
+  P.whitespace,
+  P.string("If false: throw to monkey "),
+  numP,
+).map(([_w, _label, n]) => ({ targetIfFalse: n }));
 const monkeyP = P.seq(
   headerLineP,
   nl.map(() => {}),
@@ -76,25 +81,87 @@ const monkeyP = P.seq(
   ifFalseLineP,
   nl.map(() => {}),
 ).map(R.reduce((acc, x) => ({ ...acc, ...x }), {}));
+const monkeysP = P.sepBy(monkeyP, nl);
 
-const testParser = () => {
-  assert.equal(60, numP.tryParse("60"));
-  const result = itemListP.tryParse("60, 94");
-  assert.equal(60, result[0]);
-  assert.equal(94, result[1]);
-  const result2 = itemListP.tryParse("60");
-  assert.equal(60, result2[0]);
-  assert.equal("+", operatorP.tryParse("+"));
-  assert.equal("*", operatorP.tryParse("*"));
-  assert.equal("old", operandP.tryParse("old"));
-  assert.equal(5, operandP.tryParse("5"));
-  console.log(operationLineP.tryParse("  Operation: new = old + 5"));
-  console.log(monkeyP.tryParse(sampleMonkey));
+const operand = R.curry((operandName, monkey, oldItemValue) =>
+  monkey[operandName] === "old" ? oldItemValue : monkey[operandName],
+);
+
+const applyRelief = (x) => Math.floor(x / 3);
+
+const applyOperator = R.curry((monkey, oldItemValue) => {
+  const a = operand("operand1", monkey, oldItemValue);
+  const b = operand("operand2", monkey, oldItemValue);
+  return monkey.operator === "*" ? a * b : a + b;
+});
+
+const getNextValue = R.curry((monkey, oldItemValue) =>
+  R.pipe(applyOperator(monkey), applyRelief)(oldItemValue),
+);
+
+const determineTarget = R.curry((monkey, itemValue) =>
+  itemValue % monkey.divTestNum === 0
+    ? monkey.targetIfTrue
+    : monkey.targetIfFalse,
+);
+
+const nextData = R.curry((monkey, oldItemValue) => {
+  const newItemValue = getNextValue(monkey, oldItemValue);
+  return {
+    newItemValue,
+    targetMonkey: determineTarget(monkey, newItemValue),
+  };
+});
+
+const distribute = (nextData, monkeyState) => {
+  console.log("len: ", nextData.length);
+  for (let next of nextData) {
+    console.log("applying ", next, ", len: ", nextData.length);
+    monkeyState[next.targetMonkey].items.push(next.newItemValue);
+  }
+  return monkeyState;
 };
+
+const runMonkey = (monkeyState, monkeyNum) => {
+  const monkey = monkeyState[monkeyNum];
+  monkey.itemsInspected = monkey.items.length + (monkey.itemsInspected || 0);
+  distribute(R.map(nextData(monkey), monkey.items), monkeyState);
+  monkey.items = [];
+  return monkeyState;
+};
+
+const runRound = (monkeyState) =>
+  R.range(0, objSize(monkeyState)).reduce(
+    (state, i) => runMonkey(state, i),
+    monkeyState,
+  );
+
+const runRounds = R.curry((count, startingState) =>
+  R.range(0, count).reduce(
+    inspectReducer((state, i) => runRound(state)),
+    startingState,
+  ),
+);
+
+const mostActiveMonkeys = R.pipe(
+  R.values,
+  R.sortBy(R.prop("itemsInspected")),
+  R.takeLast(2),
+);
+
+const calculateMonkeyBusiness = (monkeyState) => {
+  const last2 = mostActiveMonkeys(monkeyState);
+  return last2[0].itemsInspected * last2[1].itemsInspected;
+};
+
+const part1 = R.pipe(
+  tryParse(monkeysP),
+  runRounds(20),
+  calculateMonkeyBusiness,
+);
 
 export async function run() {
   const rawFileContent = await getFileContent(inputFile);
-  testParser();
-  // console.log("part1: ", part1(rawFileContent));
+  console.log("part1: ", part1(rawFileContent));
   // console.log("part2: ", part2(rawFileContent));
 }

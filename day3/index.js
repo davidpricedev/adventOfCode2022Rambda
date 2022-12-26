@@ -24,14 +24,14 @@ const priorityValueFromContents = R.pipe(
   R.map(R.split("")),
   ([a, b]) => R.intersection(a, b),
   ([x]) => x,
-  itemToValue
+  itemToValue,
 );
 
 const day3Part1 = R.pipe(
   R.trim,
   R.split("\n"),
   R.map(priorityValueFromContents),
-  R.sum
+  R.sum,
 );
 
 const findBadgeItem = ([a, b, c]) => R.intersection(a, R.intersection(b, c));
@@ -43,7 +43,7 @@ const day3Part2 = R.pipe(
   R.split("\n"),
   R.splitEvery(3),
   R.map(findBadgeValue),
-  R.sum
+  R.sum,
 );
 
 export async function run() {
