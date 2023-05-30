@@ -15,6 +15,7 @@ const inputFile = "day7/input.txt";
   type Structure = {
     root: Dir,
     dirStack: Dir[],
+    allDirs: Dir[],
   }
   type Dir = {
     name: string,
@@ -22,16 +23,18 @@ const inputFile = "day7/input.txt";
     directSize: number,
     totalSize: number,
     fullPath: string,
+    type: "D",
   }
   type File = {
     name: string,
     size: number,
+    type: "F",
   }
   type Entry = Dir | File;
 */
 
 const emptyStructure = () => {
-  const root =  { name: "/", children: [], directSize: 0, fullPath: "/", type: "D" };
+  const root =  { name: "/", children: [], directSize: 0, fullPath: "", type: "D" };
   return { root, dirStack: [], allDirs: [root] };
 };
 
@@ -107,8 +110,30 @@ const part1 = R.pipe(
   R.sum
 );
 
+const totalDiskSize = 70000000;
+const freeSpaceNeeded = 30000000;
+
+const findDirToDelete = (structure) => {
+  const freeSpace = totalDiskSize - structure.root.totalSize;
+  const minDirSize = freeSpaceNeeded - freeSpace;
+  const findSmallestCandidate = R.pipe(
+    R.map(x => x.totalSize),
+    R.filter(x => x >= minDirSize),
+    R.reduce(R.min, Infinity),
+  );
+  return findSmallestCandidate(structure.allDirs);
+};
+
+const part2 = R.pipe(
+  R.split("\n"),
+  R.reduce(handleLine, emptyStructure()),
+  (structure) => { calculateTotalSize(structure.root); return structure; },
+  // inspect("structure"),
+  findDirToDelete,
+);
+
 export async function run() {
   const rawFileContent = await getFileContent(inputFile);
   console.log("part1: ", part1(rawFileContent));
-  // console.log("part2: ", part2(rawFileContent));
+  console.log("part2: ", part2(rawFileContent));
 }
